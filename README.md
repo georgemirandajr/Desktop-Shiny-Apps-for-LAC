@@ -8,9 +8,9 @@ You can create a wonderful Shiny application with R that processes data and empo
 By default, RInno creates two files that deal with making sure that your Shiny app has the packages it needs to work: `ensure.R` and `package_manager.R`. These files essentially check to see what packages are needed and uses an internet connection to install them, if not already installed. Unfortunately, we cannot expect this install process to work properly every single time because there are security protocols in place that require LA County network users to sign-in with credentials and even then the packages may fail to download or improperly install.  
 
 # The Solution
-By modifying the two files that check for and install packages, we can bypass this issue with internet connectivity and security. Also, we can bundle the packages required for the application in the executable file so that there is no need to download them from anywhere else. Make sure to use R version 3.4.3 and the latest version of RInno to create your application __files__. You may use any version to actually create your app, but RInno seems to work best with the latest version of R. 
+By modifying the two files that check for and install packages, we can bypass this issue with internet connectivity/security. Also, we can bundle the packages required for the application in the executable file so that there is no need to download them from anywhere else. Make sure to use R version 3.4.3 and the latest version of RInno to create your application __files__. You may use any version to actually create your __app__, but RInno seems to work best with the latest version of R. 
 
-### Step 1: Manage your library
+### Step 1: Manage your library as you build your app
 As you build your application, make note of the packages and package version you are using. Also make note of the R version you are using. Ensure that you have identified all the dependencies that your packages may need. This can be difficult when you use many packages because one package may depend on a dozen other packages, so I suggest installing the packages you are using into a separate folder. You can accomplish this by doing something like:
   
 `install.packages( "ggplot2", lib = "C:/Users/e12345/Desktop/temp_library" )`
@@ -20,17 +20,18 @@ Or if you want an older version of a package, you can find its URL and download 
 `packageurl <- "http://cran.r-project.org/src/contrib/Archive/ggplot2/ggplot2_0.9.1.tar.gz"
 install.packages(packageurl, repos=NULL, type="source", lib = "C:/Users/e12345/Desktop/temp_library")`
   
-Assuming you have already created this folder on your desktop called, "temp_library", this code will install the specified package and its dependencies. **Note: This is not intended to be your working library, just a separate place to manage your packages** 
+Assuming you have already created a folder on your desktop called, "temp_library", the above code will install the specified package and its dependencies. **Note: This is not intended to be your working library, just a separate place to manage your packages** 
 
-You should do install your app's packages in a temporary folder in addition to the three packages that RInno itself requires to work: jsonlite, shiny, and magrittr. You also want to make sure that all the R base packages are included in your temporary folder. This would depend on which version of R you are using.
+You should install your app's packages in this temporary folder in addition to the three packages that RInno itself requires for it to work: jsonlite, shiny, and magrittr. You also want to make sure that all the base R packages are included in your temporary folder. This would depend on which version of R you are using.
 
 ### Step 2: Create your app
   
-* Install the latest `RInno` from CRAN or Github. 
-* Install Inno Setup (to compile)
-* Use `create_app()`
-* Modify `ensure.R` and `package_manager.R`
-* Compile the app
+At a high level, creating your app with RInno involves:
+* Installing the latest `RInno` from CRAN or Github. 
+* Installing Inno Setup (to compile)
+* Using `create_app()` to create the application files
+* Modifying `ensure.R` and `package_manager.R` using this repo
+* Compiling the app
 
 The code:
 
@@ -43,22 +44,23 @@ devtools::install_github("ficonsulting/RInno",  build_vignettes = TRUE)require(R
 RInno::install_inno()
 
 create_app(
-    app_name    = "My App Name", # this just calls it  
+    app_name    = "My Cool App Name", # this just gives your app a name to use on various parts of your app  
     app_dir     = "C:/path/to/MyApp", # location of my app
     # pkgs        = c("shiny"),  # Don't use this argument
     # remotes     = c("daattali/shinyjs"), # Don't use this argument
-    user_browser = "ie",  # LA County uses Internet Explorer as the standard browser
+    user_browser = "ie",  # LA County uses Internet Explorer as the standard browser.
     include_R   = TRUE,     # Download R and install it with your app
     R_version   = "3.4.3",  # Specify the version of R you want
     privilege   = "lowest",   # Does not require Admin installation
     R_flags = '/SILENT /DIR=""C:\\""'   # Install R on C Drive to avoid Program Files )
 ```
+There are other arguments and options and I suggest you use `?RInno::create_app` to read more about them. For example, you can include an installation of Google Chrome and specify that your app use Chrome as the default browser.  
 
 ### Step 3: Modify ensure.R and package_manager.R
 Download `ensure.R` and `package_manager.R` from this Github repo and copy/paste them into the `utils` folder that was created by `create_app()`. 
 
 ### Step 4: Modify the Inno Setup Script (if necessary)
-Something funny happens to some file names that have `.` (periods) in them (e.g., `data.table`). For some reason, when `create_app` creates the Inno Setup Script (.iss) in your app folder, it may have removed any files with periods. So if you used `data.table` package (like I did), then all the associated file names with that package were changed to `datatable`. To overcome this, open the `.iss` file and find places where this might have happened and correct the names. This can be difficult to do manually, so I suggest starting with the package names and then any other files included in your app that have periods in their names. Use `Ctrl+H` to find and replace errors you might find.
+Something funny happens to some file names that have `.` (periods) in them (e.g., `data.table`). For some reason, when `create_app` creates the Inno Setup Script (.iss) in your app folder, it may have removed any files with periods. So if you used `data.table` package (like I did), then all the associated file names with that package were changed to `datatable`. To overcome this, open the `.iss` file and find places where this might have happened and correct the names. This can be difficult to do manually, so I suggest starting with the package names and then any other files included in your app that have periods in their names. Use `Ctrl+H` to find and replace errors in the Inno Setup Script you might find.
 
 ### Step 5: Bundle your temporary library with your app
 In your application's folder, create a new sub-folder simply called, "library". Then copy all the packages that are in your `temp_library` into this new library folder. Make sure they all copied over and that they include base R packages **and** `jsonlite`, `shiny`, and `magrittr`. 
