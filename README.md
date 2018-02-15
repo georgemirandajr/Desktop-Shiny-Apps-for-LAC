@@ -52,7 +52,8 @@ create_app(
     include_R   = TRUE,     # Download R and install it with your app
     R_version   = "3.4.3",  # Specify the version of R you want
     privilege   = "lowest",   # Does not require Admin installation
-    R_flags = '/SILENT /DIR=""C:\\""'   # Install R on C Drive to avoid Program Files )
+    R_flags = '/SILENT'   # Install R 
+    )
 ```
 There are other arguments and options and I suggest you use `?RInno::create_app` to read more about them. For example, you can include an installation of Google Chrome and specify that your app use Chrome as the default browser.  
 
