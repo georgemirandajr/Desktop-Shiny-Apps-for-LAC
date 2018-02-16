@@ -4,6 +4,8 @@ Using the RInno package in the LA County network can pose workflow issues. Follo
 # The Problem
 You can create a wonderful Shiny application with R that processes data and empowers others to be productive, but how do you deploy it to non-R-users? Your options are either a web-based application (hosted on a Shiny server) or a desktop version. This brief tutorial shows you how to use the RInno package to turn your Shiny app into an executable file that can be installed on any Windows PC. 
 
+More info on the RInno package can be found here: https://github.com/ficonsulting/RInno and here: https://www.ficonsulting.com/filabs/RInno
+
 ### RInno in the LA County Environment
 By default, RInno creates two files that deal with making sure that your Shiny app has the packages it needs to work: `ensure.R` and `package_manager.R`. These files essentially check to see what packages are needed and uses an internet connection to install them, if not already installed. Unfortunately, we cannot expect this install process to work properly every single time because there are security protocols in place that require LA County network users to sign-in with credentials and even then the packages may fail to download or improperly install.  
 
