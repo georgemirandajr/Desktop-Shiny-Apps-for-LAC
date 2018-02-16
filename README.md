@@ -1,5 +1,5 @@
 # Desktop-Shiny-Apps-for-LAC
-Using the RInno package in the LA County network can pose workflow issues. Follow these steps deploy Shiny apps on secure locations.
+Using the RInno package in the LA County network can pose workflow issues. Follow these steps to deploy Shiny apps on secure locations.
 
 # The Problem
 You can create a wonderful Shiny application with R that processes data and empowers others to be productive, but how do you deploy it to non-R-users? Your options are either a web-based application (hosted on a Shiny server) or a desktop version. This brief tutorial shows you how to use the RInno package to turn your Shiny app into an executable file that can be installed on any Windows PC. 
@@ -23,6 +23,9 @@ install.packages(packageurl, repos=NULL, type="source", lib = "C:/Users/e12345/D
 Assuming you have already created a folder on your desktop called, "temp_library", the above code will install the specified package and its dependencies. **Note: This is not intended to be your working library, just a separate place to manage your packages** 
 
 You should install your app's packages in this temporary folder in addition to the three packages that RInno itself requires for it to work: jsonlite, shiny, and magrittr. You also want to make sure that all the base R packages are included in your temporary folder. This would depend on which version of R you are using.
+
+#### Bundle your temporary library with your app
+**Last tip for managing your packages:** create a new folder in your app directory called "library". You need to copy/paste all the packages your app needs into this folder before you call the `create_app` function. It could be argued that you don't really need to do the previous step of downloading packages into a "temp library" folder, but I found that this was a cleaner and more manageable workflow for me. 
 
 ### Step 2: Create your app
   
@@ -57,16 +60,15 @@ create_app(
 ```
 There are other arguments and options and I suggest you use `?RInno::create_app` to read more about them. For example, you can include an installation of Google Chrome and specify that your app use Chrome as the default browser.  
 
+Calling `create_app` would normally create a library folder in your app directory, but __since you already have one with all your packages in it__ it does not need to create it or override it. 
+
 ### Step 3: Modify ensure.R and package_manager.R
-Download `ensure.R` and `package_manager.R` from this Github repo and copy/paste them into the `utils` folder that was created by `create_app()`. 
+Download `ensure.R` and `package_manager.R` from this Github repo and copy/paste them into the `utils` folder that was created by `create_app()`. Remember, these scripts normally use an internet connection to download required packages, but because you already provided them in your own `library` folder, it does not need to go through this check. The modified versions of these scripts basically omit the `install.packages()` calls to prevent connectivity/authorization issues.  
 
 ### Step 4: Modify the Inno Setup Script (if necessary)
 Something funny happens to some file names that have `.` (periods) in them (e.g., `data.table`). For some reason, when `create_app` creates the Inno Setup Script (.iss) in your app folder, it may have removed any files with periods. So if you used `data.table` package (like I did), then all the associated file names with that package were changed to `datatable`. To overcome this, open the `.iss` file and find places where this might have happened and correct the names. This can be difficult to do manually, so I suggest starting with the package names and then any other files included in your app that have periods in their names. Use `Ctrl+H` to find and replace errors in the Inno Setup Script you might find.
 
-### Step 5: Bundle your temporary library with your app
-In your application's folder, create a new sub-folder simply called, "library". Then copy all the packages that are in your `temp_library` into this new library folder. Make sure they all copied over and that they include base R packages **and** `jsonlite`, `shiny`, and `magrittr`. 
-
-### Step 6: Compile
+### Step 5: Compile
 Before you compile, you can optionally change the `infobefore.txt` and `infoafter.txt` files, as well as the icons used in your app. RInno provides defaults, but feel free to change them.
 
 Once you're done modifying the Inno Setup Script and the package managing R scripts, you can compile using:
@@ -75,7 +77,7 @@ compile_iss()
 ```
 This function will attempt to download the version of R that you specified in `create_app`, so make sure you have provided your credentials in a web browser and acknowledged the internet terms of use before compiling.
 
-### Step 7: Double-Check
+### Step 6: Double-Check
 The compiling process should have created a sub-folder, "RInno_installer", which is where your executable file is placed. Open your executable file and install the app on your desktop and another desktop to make sure it works as expected. 
 
 ### Troubleshooting
