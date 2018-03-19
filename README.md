@@ -38,7 +38,7 @@ At a high level, creating your app with RInno involves:
 * Modifying `ensure.R` and `package_manager.R` using this repo
 * Compiling the app
 
-The code:
+First, run this code to create the files necessary to build an executable file:
 
 ```r
 # If you don't have development tools, install them
@@ -60,17 +60,14 @@ create_app(
     R_flags = '/SILENT'   # Install R 
     )
 ```
-There are other arguments and options and I suggest you use `?RInno::create_app` to read more about them. For example, you can include an installation of Google Chrome and specify that your app use Chrome as the default browser.  
+The above code should have created a `utils` folder and several files in your app folder. Calling `create_app` would normally create a library folder in your app directory, but __since you already have one with all your packages in it__ it does not need to create it or override it. Check this folder to make sure that all your packages are still there.
 
-Calling `create_app` would normally create a library folder in your app directory, but __since you already have one with all your packages in it__ it does not need to create it or override it. 
+There are other arguments and options and I suggest you use `?RInno::create_app` to read more about them. For example, you can include an installation of Google Chrome and specify that your app use Chrome as the default browser.  
 
 ### Step 3: Modify ensure.R and package_manager.R
 Download `ensure.R` and `package_manager.R` from this Github repo and copy/paste them into the `utils` folder that was created by `create_app()`. Remember, these scripts normally use an internet connection to download required packages, but because you already provided them in your own `library` folder, it does not need to go through this check. The modified versions of these scripts basically omit the `install.packages()` calls to prevent connectivity/authorization issues.  
 
-### Step 4: Modify the Inno Setup Script (if necessary)
-Something funny happens to some file names that have `.` (periods) in them (e.g., `data.table`). For some reason, when `create_app` creates the Inno Setup Script (.iss) in your app folder, it may have removed any files with periods. So if you used `data.table` package (like I did), then all the associated file names with that package were changed to `datatable`. To overcome this, open the `.iss` file and find places where this might have happened and correct the names. This can be difficult to do manually, so I suggest starting with the package names and then any other files included in your app that have periods in their names. Use `Ctrl+H` to find and replace errors in the Inno Setup Script you might find.
-
-### Step 5: Compile
+### Step 4: Compile
 Before you compile, you can optionally change the `infobefore.txt` and `infoafter.txt` files, as well as the icons used in your app. RInno provides defaults, but feel free to change them.
 
 Once you're done modifying the Inno Setup Script and the package managing R scripts, you can compile using:
@@ -79,11 +76,11 @@ compile_iss()
 ```
 This function will attempt to download the version of R that you specified in `create_app`, so make sure you have provided your credentials in a web browser and acknowledged the internet terms of use before compiling.
 
-### Step 6: Double-Check
+### Step 5: Double-Check
 The compiling process should have created a sub-folder, "RInno_installer", which is where your executable file is placed. Open your executable file and install the app on your desktop and another desktop to make sure it works as expected. 
 
 ### Troubleshooting
 If you get an error after you installed and tried opening the app, there is an error log located in the `error` sub-folder of the desktop app. Read the log to determine where the error might be.
   
-Some typical errors might have to do with packages missing. This could be related to the package files not being correctly compiled by Inno Setup. Check the file names to ensure that no packages had files with a `.` period in the name. You can also read the log to see if the library path is correctly using your `library` sub-folder that is within your app's directory.
+Some typical errors might have to do with packages missing. This could be related to the package files not being correctly compiled by Inno Setup. You can also read the log to see if the library path is correctly using your `library` sub-folder that is within your app's directory.
 
