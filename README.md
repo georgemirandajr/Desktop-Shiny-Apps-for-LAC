@@ -44,8 +44,9 @@ First, run this code to create the files necessary to build an executable file:
 # If you don't have development tools, install them
 install.packages("devtools"); require(devtools)
 # Use install_github to get RInno
-devtools::install_github("ficonsulting/RInno",  build_vignettes = TRUE)require(RInno)
-# Use RInno to get Inno Setup
+devtools::install_github("ficonsulting/RInno",  build_vignettes = TRUE)
+require(RInno)
+# Use RInno to get Inno Setup (only need to install Inno once)
 RInno::install_inno()
 
 create_app(
@@ -57,12 +58,14 @@ create_app(
     include_R   = TRUE,     # Download R and install it with your app
     R_version   = "3.4.3",  # Specify the version of R you want
     privilege   = "lowest",   # Does not require Admin installation
+    app_icon = "la_county.ico",
+    default_dir = "userdesktop",  # Install to desktop to avoid issues with servers
     R_flags = '/SILENT'   # Install R 
     )
 ```
 The above code should have created a `utils` folder and several files in your app folder. Calling `create_app` would normally create a library folder in your app directory, but __since you already have one with all your packages in it__ it does not need to create it or override it. Check this folder to make sure that all your packages are still there.
 
-There are other arguments and options and I suggest you use `?RInno::create_app` to read more about them. For example, you can include an installation of Google Chrome and specify that your app use Chrome as the default browser.  
+There are other arguments and options and I suggest you use `?RInno::create_app` to read more about them. For example, you can include an installation of Google Chrome and specify that your app use Chrome as the default browser. However, doing so might drastically increase the size of your application. 
 
 ### Step 3: Modify ensure.R and package_manager.R
 Download `ensure.R` and `package_manager.R` from this Github repo and copy/paste them into the `utils` folder that was created by `create_app()`. Remember, these scripts normally use an internet connection to download required packages, but because you already provided them in your own `library` folder, it does not need to go through this check. The modified versions of these scripts basically omit the `install.packages()` calls to prevent connectivity/authorization issues.  
